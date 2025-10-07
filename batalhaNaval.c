@@ -1,4 +1,78 @@
 #include <stdio.h>
+// Função para posicionar navio em formato de cone (triângulo)
+void posicionaCone(int tabuleiro[10][10], int linha, int coluna, int valorNavio)
+{
+    // Vértice do cone
+    tabuleiro[linha][coluna] = valorNavio;
+    // Base do cone (linha abaixo, 3 células)
+    if (linha + 1 < 10)
+    {
+        if (coluna - 1 >= 0)
+            tabuleiro[linha + 1][coluna - 1] = valorNavio;
+        tabuleiro[linha + 1][coluna] = valorNavio;
+        if (coluna + 1 < 10)
+            tabuleiro[linha + 1][coluna + 1] = valorNavio;
+    }
+}
+
+// Função para posicionar navio em formato de cruz (célula central + linhas horizontal e vertical)
+void posicionaCruz(int tabuleiro[10][10], int linha, int coluna, int valorNavio)
+{
+    tabuleiro[linha][coluna] = valorNavio;
+    // Só posiciona se estiver dentro dos limites
+    if (linha > 0)
+        tabuleiro[linha - 1][coluna] = valorNavio;
+    if (linha < 9)
+        tabuleiro[linha + 1][coluna] = valorNavio;
+    if (coluna > 0)
+        tabuleiro[linha][coluna - 1] = valorNavio;
+    if (coluna < 9)
+        tabuleiro[linha][coluna + 1] = valorNavio;
+}
+
+// Função para posicionar navio em formato de octaedro (losango completo)
+void posicionaOctaedro(int tabuleiro[10][10], int linha, int coluna, int valorNavio)
+{
+    // Centro
+    tabuleiro[linha][coluna] = valorNavio;
+    // Direções ortogonais
+    if (linha > 0)
+        tabuleiro[linha - 1][coluna] = valorNavio;
+    if (linha < 9)
+        tabuleiro[linha + 1][coluna] = valorNavio;
+    if (coluna > 0)
+        tabuleiro[linha][coluna - 1] = valorNavio;
+    if (coluna < 9)
+        tabuleiro[linha][coluna + 1] = valorNavio;
+    // Diagonais
+    if (linha > 0 && coluna > 0)
+        tabuleiro[linha - 1][coluna - 1] = valorNavio;
+    if (linha > 0 && coluna < 9)
+        tabuleiro[linha - 1][coluna + 1] = valorNavio;
+    if (linha < 9 && coluna > 0)
+        tabuleiro[linha + 1][coluna - 1] = valorNavio;
+    if (linha < 9 && coluna < 9)
+        tabuleiro[linha + 1][coluna + 1] = valorNavio;
+    // Vértices mais distantes para formar o losango maior
+    if (linha > 1)
+        tabuleiro[linha - 2][coluna] = valorNavio;
+    if (linha < 8)
+        tabuleiro[linha + 2][coluna] = valorNavio;
+    if (coluna > 1)
+        tabuleiro[linha][coluna - 2] = valorNavio;
+    if (coluna < 8)
+        tabuleiro[linha][coluna + 2] = valorNavio;
+}
+
+// Função para posicionar navios de tamanho 3 na diagonal secundária (direita para esquerda)
+void posicionaDiagonalSecundaria(int tabuleiro[10][10], int valorNavio)
+{
+    // Apenas 3 células consecutivas: [0][9], [1][8], [2][7]
+    for (int i = 0; i < 3; i++)
+    {
+        tabuleiro[i][9 - i] = valorNavio;
+    }
+}
 void inicializarTabuleiro(int tabuleiro[10][10])
 {
     for (int i = 0; i < 10; i++)
@@ -9,15 +83,21 @@ void inicializarTabuleiro(int tabuleiro[10][10])
         }
     }
 }
-int posicaoNavios(int tabuleiro[10][10])
+// Função para posicionar navio horizontal de tamanho 3
+void posicionaNavioHorizontal(int tabuleiro[10][10], int linha, int colunaInicial, int valorNavio)
 {
-    for (int j = 3; j <= 6; j++)
+    for (int j = colunaInicial; j < colunaInicial + 3; j++)
     {
-        tabuleiro[3][j] = 3;
+        tabuleiro[linha][j] = valorNavio;
     }
-    for (int i = 4; i <= 7; i++)
+}
+
+// Função para posicionar navio vertical de tamanho 3
+void posicionaNavioVertical(int tabuleiro[10][10], int coluna, int linhaInicial, int valorNavio)
+{
+    for (int i = linhaInicial; i < linhaInicial + 3; i++)
     {
-        tabuleiro[i][7] = 3;
+        tabuleiro[i][coluna] = valorNavio;
     }
 }
 void imprimirTabuleiro(int tabuleiro[10][10])
@@ -29,14 +109,24 @@ void imprimirTabuleiro(int tabuleiro[10][10])
         printf("%d", i);
         for (int j = 0; j < 10; j++)
         {
-            if (tabuleiro[i][j] == 3)
+            if (tabuleiro[i][j] == 1)
             {
-                // Vermelho para navios
-                printf("\033[31m%2d\033[0m", tabuleiro[i][j]);
+                // Cone: azul
+                printf("\033[34m%2d\033[0m", tabuleiro[i][j]);
+            }
+            else if (tabuleiro[i][j] == 2)
+            {
+                // Cruz: verde
+                printf("\033[32m%2d\033[0m", tabuleiro[i][j]);
+            }
+            else if (tabuleiro[i][j] == 3)
+            {
+                // Octaedro: magenta
+                printf("\033[35m%2d\033[0m", tabuleiro[i][j]);
             }
             else
             {
-                // Cor padrão para água
+                // Água: padrão
                 printf("%2d", tabuleiro[i][j]);
             }
         }
@@ -44,45 +134,20 @@ void imprimirTabuleiro(int tabuleiro[10][10])
     }
 }
 
-int main() {
-  int tabuleiro[10][10];
+int main()
+{
+    int tabuleiro[10][10];
     inicializarTabuleiro(tabuleiro);
 
-    posicaoNavios(tabuleiro);
+    // Cone: azul, formato triangular (vértice em [1][1], base em [2][0], [2][1], [2][2])
+    posicionaCone(tabuleiro, 1, 1, 1); // valorNavio 1 = cone (azul)
+
+    // Cruz: linha 7, coluna F (coluna 5)
+    posicionaCruz(tabuleiro, 7, 5, 2); // valorNavio 2 = cruz (verde)
+
+    // Octaedro: centro do tabuleiro (linha 4, coluna 4)
+    posicionaOctaedro(tabuleiro, 4, 4, 3); // valorNavio 3 = octaedro (magenta)
 
     imprimirTabuleiro(tabuleiro);
-
-    return 0; 
-    // Nível Novato - Posicionamento dos Navios
-    // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
-    // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
-    // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
-
-    // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
-    // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
-    // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
-    // Sugestão: Exiba o tabuleiro completo no console, mostrando 0 para posições vazias e 3 para posições ocupadas.
-
-    // Nível Mestre - Habilidades Especiais com Matrizes
-    // Sugestão: Crie matrizes para representar habilidades especiais como cone, cruz, e octaedro.
-    // Sugestão: Utilize estruturas de repetição aninhadas para preencher as áreas afetadas por essas habilidades no tabuleiro.
-    // Sugestão: Exiba o tabuleiro com as áreas afetadas, utilizando 0 para áreas não afetadas e 1 para áreas atingidas.
-
-    // Exemplos de exibição das habilidades:
-    // Exemplo para habilidade em cone:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 1 1 1 1 1
-    
-    // Exemplo para habilidade em octaedro:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 0 0 1 0 0
-
-    // Exemplo para habilidade em cruz:
-    // 0 0 1 0 0
-    // 1 1 1 1 1
-    // 0 0 1 0 0
-
     return 0;
 }
