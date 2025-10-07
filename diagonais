@@ -1,0 +1,85 @@
+#include <stdio.h>
+// Função para posicionar navios de tamanho 3 na diagonal principal (esquerda para direita)
+void posicionaDiagonalPrincipal(int tabuleiro[10][10], int valorNavio) {
+    // Apenas 3 células consecutivas: [0][0], [1][1], [2][2]
+    for (int i = 0; i < 3; i++) {
+        tabuleiro[i][i] = valorNavio;
+    }
+}
+
+// Função para posicionar navios de tamanho 3 na diagonal secundária (direita para esquerda)
+void posicionaDiagonalSecundaria(int tabuleiro[10][10], int valorNavio) {
+    // Apenas 3 células consecutivas: [0][9], [1][8], [2][7]
+    for (int i = 0; i < 3; i++) {
+        tabuleiro[i][9 - i] = valorNavio;
+    }
+}
+void inicializarTabuleiro(int tabuleiro[10][10])
+{
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            tabuleiro[i][j] = 0;
+        }
+    }
+}
+// Função para posicionar navio horizontal de tamanho 3
+void posicionaNavioHorizontal(int tabuleiro[10][10], int linha, int colunaInicial, int valorNavio) {
+    for (int j = colunaInicial; j < colunaInicial + 3; j++) {
+        tabuleiro[linha][j] = valorNavio;
+    }
+}
+
+// Função para posicionar navio vertical de tamanho 3
+void posicionaNavioVertical(int tabuleiro[10][10], int coluna, int linhaInicial, int valorNavio) {
+    for (int i = linhaInicial; i < linhaInicial + 3; i++) {
+        tabuleiro[i][coluna] = valorNavio;
+    }
+}
+void imprimirTabuleiro(int tabuleiro[10][10])
+{
+    printf("TABULEIRO BATALHA NAVAL\n");
+    printf("  A B C D E F G H I J\n");
+    for (int i = 0; i < 10; i++)
+    {
+        printf("%d", i);
+        for (int j = 0; j < 10; j++)
+        {
+            if (tabuleiro[i][j] == 3)
+            {
+                // Vermelho para navios
+                printf("\033[31m%2d\033[0m", tabuleiro[i][j]);
+            }
+            else
+            {
+                // Cor padrão para água
+                printf("%2d", tabuleiro[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+int main()
+{
+    int tabuleiro[10][10];
+    inicializarTabuleiro(tabuleiro);
+
+
+    // Posiciona navio horizontal de tamanho 3 na linha 5, colunas 0, 1 e 2 (A, B, C)
+    posicionaNavioHorizontal(tabuleiro, 5, 0, 3); // 3 representa navio
+
+    // Posiciona navio vertical de tamanho 3 na coluna 7, começando na linha 4
+    posicionaNavioVertical(tabuleiro, 7, 4, 3); // 3 representa navio
+
+    // Posiciona navios na diagonal principal
+    posicionaDiagonalPrincipal(tabuleiro, 3); // 3 representa navio
+
+    // Posiciona navios na diagonal secundária
+    posicionaDiagonalSecundaria(tabuleiro, 3); // 3 representa navio
+
+    imprimirTabuleiro(tabuleiro);
+
+    return 0;
+}
